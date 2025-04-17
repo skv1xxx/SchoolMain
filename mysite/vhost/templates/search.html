@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск видео</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-margin {
+            height: 50px;
+            background: linear-gradient(135deg, #ff8c00, #ff6b00);
+        }
+
+        header {
+            background-color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-button {
+            padding: 10px 20px;
+            background-color: #ff8c00;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-button:hover {
+            background-color: #e67300;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: #f0f0f0;
+            border-radius: 25px;
+            padding: 8px 15px;
+            width: 250px;
+        }
+
+        .search-input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            opacity: 0.6;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
+
+        h1 {
+            color: #444;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .search-box {
+            display: flex;
+            margin-bottom: 30px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #ffd8b3;
+            border-radius: 8px 0 0 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-box button {
+            padding: 12px 20px;
+            background-color: #ff8c00;
+            color: white;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .search-box button:hover {
+            background-color: #e67300;
+        }
+
+        .video-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .video-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            background-color: #eee;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-info {
+            padding: 15px;
+        }
+
+        .video-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .bottom-margin {
+            height: 50px;
+            background: linear-gradient(135deg, #ff8c00, #ff6b00);
+        }
+
+        footer {
+            margin-top: auto;
+            background-color: #333;
+            color: #aaa;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-margin"></div>
+
+    <header>
+        <div class="header-content">
+            <div class="nav-buttons">
+                <a href="home" class="nav-button">Главная</a>
+                <a href="kat" class="nav-button">Категории</a>
+                <a href="about_us" class="nav-button">О нас</a>
+                <a href="acc" class="nav-button">Аккаунт</a>
+            </div>
+
+            <div class="search-container">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE1LjUgMTRoLS43OWwtLjI4LS4yN0MxNS40MSAxMi41OSAxNiAxMS4xMSAxNiA5LjUgMTYgNS45MSAxMy4wOSAzIDkuNSAzUzMgNS45MSAzIDkuNSA1LjkxIDE2IDkuNSAxNmMxLjYxIDAgMy4wOS0uNTkgNC4yMy0xLjU3bC4yNy4yOHYuNzlsNSA0Ljk5TDIwLjQ5IDE5bC00Ljk5LTV6bS02IDBDNy4wMSAxNCA1IDExLjk5IDUgOS41UzcuMDEgNSA5LjUgNSAxNCA3LjAxIDE0IDkuNSAxMS45OSAxNCA5LjUgMTR6IiBmaWxsPSIjNjY2Ii8+PC9zdmc+" alt="Search" class="search-icon">
+                <input type="text" class="search-input" placeholder="Поиск...">
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="content">
+            <h1>Поиск видео</h1>
+
+            <div class="search-box">
+                <input type="text" id="video-search" placeholder="Введите название видео...">
+                <button id="search-button">Найти</button>
+            </div>
+
+            <div class="video-results" id="video-results">
+                <!-- Результаты поиска будут здесь -->
+                <div class="no-results">Введите запрос для поиска видео</div>
+            </div>
+        </div>
+    </main>
+
+    <div class="bottom-margin"></div>
+
+    <footer>
+        Сделано: by skv1xxx
+    </footer>
+
+    <script>
+        document.getElementById('search-button').addEventListener('click', function() {
+            const query = document.getElementById('video-search').value.trim();
+            const resultsContainer = document.getElementById('video-results');
+
+            if (query === '') {
+                resultsContainer.innerHTML = '<div class="no-results">Пожалуйста, введите поисковый запрос</div>';
+                return;
+            }
+
+            // Здесь должна быть реальная логика поиска (AJAX запрос к серверу)
+            // Это примерная имитация результатов
+
+            // Очищаем предыдущие результаты
+            resultsContainer.innerHTML = '';
+
+            // Имитация загрузки
+            resultsContainer.innerHTML = '<div class="no-results">Идет поиск...</div>';
+
+            // Имитация ответа от сервера (замените на реальный AJAX запрос)
+            setTimeout(function() {
+                const mockResults = [
+                    {
+                        title: 'Как создать сайт за 10 минут',
+                        category: 'Образование',
+                        views: '125K',
+                        thumbnail: 'https://via.placeholder.com/300x180/ff8c00/ffffff?text=Video+1'
+                    },
+                    {
+                        title: 'Лучшие моменты матча',
+                        category: 'Спорт',
+                        views: '542K',
+                        thumbnail: 'https://via.placeholder.com/300x180/ff6b00/ffffff?text=Video+2'
+                    },
+                    {
+                        title: 'Новый клип популярного исполнителя',
+                        category: 'Музыка',
+                        views: '1.2M',
+                        thumbnail: 'https://via.placeholder.com/300x180/e67300/ffffff?text=Video+3'
+                    }
+                ];
+
+                if (mockResults.length === 0) {
+                    resultsContainer.innerHTML = '<div class="no-results">По вашему запросу ничего не найдено</div>';
+                    return;
+                }
+
+                let html = '';
+                mockResults.forEach(video => {
+                    html += `
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="${video.thumbnail}" alt="${video.title}">
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-meta">
+                                <span>${video.category}</span>
+                                <span>${video.views} просмотров</span>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                });
+
+                resultsContainer.innerHTML = html;
+            }, 800);
+        });
+
+        // Поиск при нажатии Enter
+        document.getElementById('video-search').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('search-button').click();
+            }
+        });
+    </script>
+</body>
+</html>

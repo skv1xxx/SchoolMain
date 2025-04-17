@@ -1,0 +1,347 @@
+{% block content %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoShare - Загрузка видео</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --primary-hover: #FF8C42;
+            --primary-light: rgba(255, 107, 53, 0.1);
+            --dark: #1A1A1A;
+            --gray: #6C757D;
+            --light-gray: #F8F9FA;
+            --white: #FFFFFF;
+            --border-radius: 12px;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAFAFA;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .upload-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .upload-container:hover {
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        .upload-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: var(--white);
+            padding: 1.75rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-header h2 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.75rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .upload-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid #E9ECEF;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: var(--light-gray);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+            outline: none;
+            background-color: var(--white);
+        }
+
+        textarea.form-control {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            margin-top: 0.5rem;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border: 2px dashed #E9ECEF;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: var(--light-gray);
+            text-align: center;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .file-upload-label i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-label span {
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-label small {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1rem;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 107, 53, 0.2);
+        }
+
+        /* Кастомный селект */
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.8rem;
+            color: var(--primary);
+            position: absolute;
+            right: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .upload-body {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-submit:active {
+            animation: pulse 0.3s;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .upload-container {
+                margin: 1rem;
+                border-radius: 10px;
+            }
+
+            .upload-header {
+                padding: 1.5rem;
+            }
+
+            .upload-body {
+                padding: 1.5rem;
+            }
+
+            .upload-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="upload-container">
+    <div class="upload-header">
+        <h2><i class="fas fa-video me-2"></i> Загрузить новое видео</h2>
+    </div>
+
+    <div class="upload-body">
+        <form method="post" enctype="multipart/form-data" id="videoUploadForm">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.title.id_for_label }}" class="form-label">Название видео</label>
+                {{ form.title }}
+                <div class="invalid-feedback">Пожалуйста, укажите название видео</div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}" class="form-label">Описание</label>
+                {{ form.description }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.publish_time.id_for_label }}" class="form-label">Время публикации</label>
+                {{ form.publish_time }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Видеофайл</label>
+                <div class="file-upload-wrapper">
+                    <label class="file-upload-label" for="{{ form.video_file.id_for_label }}">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Перетащите файл или кликните для выбора</span>
+                        <small>Поддерживаемые форматы: MP4, MOV, AVI (до 2GB)</small>
+                    </label>
+                    {{ form.video_file }}
+                </div>
+                <div class="invalid-feedback">Пожалуйста, выберите видеофайл</div>
+            </div>
+
+            <div class="form-group select-wrapper">
+                <label for="{{ form.category.id_for_label }}" class="form-label">Категория</label>
+                {{ form.category }}
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-upload me-2"></i> Опубликовать видео
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Обработка загрузки файла
+    document.getElementById('{{ form.video_file.id_for_label }}').addEventListener('change', function(e) {
+        const label = document.querySelector('.file-upload-label span');
+        if(this.files.length > 0) {
+            label.textContent = this.files[0].name;
+            document.querySelector('.file-upload-label').style.borderColor = 'var(--primary)';
+        } else {
+            label.textContent = 'Перетащите файл или кликните для выбора';
+        }
+    });
+
+    // Drag and drop функционал
+    const fileUploadLabel = document.querySelector('.file-upload-label');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        fileUploadLabel.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        fileUploadLabel.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        fileUploadLabel.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+        fileUploadLabel.style.borderColor = 'var(--primary)';
+        fileUploadLabel.style.backgroundColor = 'var(--primary-light)';
+    }
+
+    function unhighlight() {
+        fileUploadLabel.style.borderColor = '#E9ECEF';
+        fileUploadLabel.style.backgroundColor = 'var(--light-gray)';
+    }
+
+    fileUploadLabel.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        document.getElementById('{{ form.video_file.id_for_label }}').files = files;
+        const event = new Event('change');
+        document.getElementById('{{ form.video_file.id_for_label }}').dispatchEvent(event);
+    }
+</script>
+</body>
+</html>
+{% endblock %}
