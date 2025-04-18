@@ -5,6 +5,6 @@ from .models import *
 class BDkatAD(admin.ModelAdmin):
     list_display = ('id', 'name')
 
-admin.site.register(CustomUser)
+admin.site.register(BDuser)
 admin.site.register(BDvid)
 admin.site.register(BDkat, BDkatAD)

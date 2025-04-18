@@ -1,14 +1,12 @@
 from django.db import models
 from django.urls import reverse
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 from django.core.validators import FileExtensionValidator
 
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 from django.core.validators import FileExtensionValidator
 
-class CustomUser(AbstractUser):
+class BDuser(models.Model):
     nickname = models.CharField(max_length=30, unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)

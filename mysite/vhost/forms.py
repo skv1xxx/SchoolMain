@@ -4,7 +4,6 @@ from django import forms
 from django.utils import timezone
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser
 
 
 class VideoForm(forms.ModelForm):
@@ -45,7 +44,7 @@ class CustomUserCreationForm(UserCreationForm):
     )
 
     class Meta:
-        model = CustomUser
+        model = BDuser
         fields = ('nickname', 'first_name', 'last_name', 'email', 'avatar', 'password1', 'password2')
         widgets = {
             'nickname': forms.TextInput(attrs={'placeholder': 'Ваш уникальный ник'}),
