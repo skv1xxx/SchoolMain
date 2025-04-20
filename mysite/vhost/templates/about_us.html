@@ -1,20 +1,80 @@
 {% extends "design/design.html" %}
-{%load static %}
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Любимый сайтик)</title>
-</head>
-<body>
+{% load static %}
 
-{% block content%}
-<a> <img src="{% static 'photos/emble.png' %}" align="right" width="500"/></a>
-<p style="color:white;font-size:40px"> Всех приветствую на данном видео-хостинге. Рады, что вы пожелали воспользоваться именно им!</p>
-<p style="color:white;font-size:40px"> Плюсы нашей платформы:</p>
-<p style="color:white;font-size:40px">  1) </p>
+{% block content %}
+<div class="about-container">
+    <h1>О моём видео-хостинге</h1>
 
-{% endblock content%}
-</body>
-</html>
+    <div class="about-content">
+        <div class="about-text">
+            <p>Добро пожаловать на мой видео-хостинг! Это платформа, где вы можете:</p>
+            <ul>
+                <li>Смотреть видео по различным категориям</li>
+                <li>Загружать собственный контент</li>
+                <li>Создавать личный аккаунт</li>
+                <li>Искать интересные материалы</li>
+            </ul>
+            <p>Я стремился создать удобное пространство для обмена видео-контентом.</p>
+        </div>
+
+        <div class="about-image">
+            <img src="{% static 'photos/emble.png' %}" alt="Логотип проекта" width="400">
+        </div>
+    </div>
+
+    <div class="project-note">
+        <p>Данный сайт был разработан в качестве учебного проекта для школы.</p>
+    </div>
+</div>
+
+<style>
+    .about-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px;
+        color: #333;
+    }
+
+    .about-container h1 {
+        font-size: 36px;
+        margin-bottom: 30px;
+        color: #ff8c00;
+    }
+
+    .about-content {
+        display: flex;
+        gap: 50px;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+
+    .about-text {
+        flex: 1;
+        font-size: 18px;
+        line-height: 1.6;
+    }
+
+    .about-text ul {
+        margin: 20px 0;
+        padding-left: 20px;
+    }
+
+    .about-text li {
+        margin-bottom: 10px;
+    }
+
+    .about-image {
+        flex: 1;
+        text-align: center;
+    }
+
+    .project-note {
+        font-style: italic;
+        text-align: center;
+        margin-top: 50px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+        color: #666;
+    }
+</style>
+{% endblock %}

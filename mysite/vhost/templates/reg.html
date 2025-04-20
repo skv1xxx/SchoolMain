@@ -1,23 +1,25 @@
+{% load static %}
 {% block content %}
 <style>
     :root {
-        --primary: #FF7F50;  /* Кораллово-оранжевый */
-        --secondary: #FF6347; /* Томатный */
-        --light: #f8f9fa;
-        --dark: #212529;
-        --error: #ef233c;
-        --success: #4cc9f0;
+        --primary: #FF7F50;
+        --primary-light: #FFA07A;
+        --secondary: #FF6347;
+        --dark: #2F2F2F;
+        --light: #FFF8F5;
+        --error: #E74C3C;
+        --border-radius: 12px;
     }
 
     * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     body {
-        background: linear-gradient(135deg, #FFA07A 0%, #FF8C00 100%);
+        background: linear-gradient(135deg, #FFB347 0%, #FF8C00 100%);
         min-height: 100vh;
         display: flex;
         justify-content: center;
@@ -26,26 +28,38 @@
     }
 
     .container {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(10px);
-        border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         width: 100%;
         max-width: 500px;
         padding: 40px;
-        animation: fadeIn 0.6s ease-out;
+        animation: fadeInUp 0.6s ease-out;
+        position: relative;
+        overflow: hidden;
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
+    .container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
     h1 {
         color: var(--dark);
-        margin-bottom: 24px;
+        margin-bottom: 30px;
         text-align: center;
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 28px;
     }
 
     .form-group {
@@ -58,68 +72,82 @@
         margin-bottom: 8px;
         color: var(--dark);
         font-weight: 500;
+        font-size: 14px;
     }
 
-    input, .avatar-input {
+    input {
         width: 100%;
-        padding: 12px 16px;
-        border: 2px solid #ddd;
-        border-radius: 8px;
+        padding: 14px 16px;
+        border: 2px solid #e9ecef;
+        border-radius: var(--border-radius);
         font-size: 16px;
         transition: all 0.3s;
         outline: none;
+        background: #f8f9fa;
     }
 
-    input:focus, .avatar-input:focus-within {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.2);
+    input:focus {
+        border-color: var(--primary-light);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(255, 127, 80, 0.2);
     }
 
     .error-message {
         color: var(--error);
-        font-size: 14px;
-        margin-top: 5px;
+        font-size: 13px;
+        margin-top: 6px;
+        display: block;
     }
 
     button {
         width: 100%;
-        padding: 14px;
+        padding: 16px;
         background: var(--primary);
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: var(--border-radius);
         font-size: 16px;
         font-weight: 600;
         cursor: pointer;
-        transition: background 0.3s, transform 0.2s;
+        transition: all 0.3s;
+        margin-top: 10px;
+        box-shadow: 0 4px 6px rgba(255, 127, 80, 0.2);
     }
 
     button:hover {
         background: var(--secondary);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(255, 99, 71, 0.25);
     }
 
     button:active {
-        transform: scale(0.98);
+        transform: translateY(0);
     }
 
     .login-link {
         text-align: center;
-        margin-top: 20px;
-        color: var(--dark);
+        margin-top: 24px;
+        color: #6c757d;
+        font-size: 14px;
     }
 
     .login-link a {
         color: var(--primary);
         text-decoration: none;
         font-weight: 500;
+        transition: all 0.2s;
     }
 
     .login-link a:hover {
+        color: var(--secondary);
         text-decoration: underline;
     }
 
-    .avatar-input {
-        padding: 8px;
+    .avatar-upload {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
     }
 
     .avatar-preview {
@@ -127,83 +155,147 @@
         height: 60px;
         border-radius: 50%;
         object-fit: cover;
-        margin-top: 10px;
+        border: 3px solid white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         display: none;
     }
 
-    /* Адаптивность */
+    .avatar-upload-btn {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+    }
+
+    .avatar-upload-btn input[type="file"] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .btn-outline {
+        padding: 10px 16px;
+        background: white;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .btn-outline:hover {
+        background: #fff0e8;
+    }
+
+    .filename {
+        font-size: 13px;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .loading {
+        animation: pulse 1.5s infinite;
+    }
+
     @media (max-width: 600px) {
         .container {
             padding: 30px 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
         }
     }
 </style>
 
 <div class="container">
     <h1>Создать аккаунт</h1>
-    <form method="post" enctype="multipart/form-data">
+
+    {% if form.non_field_errors %}
+        <div class="error-message" style="margin-bottom: 20px;">
+            {{ form.non_field_errors.0 }}
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="registerForm">
         {% csrf_token %}
 
         <div class="form-group">
             <label for="id_nickname">Никнейм</label>
-            <input type="text" name="nickname" id="id_nickname" placeholder="Ваш уникальный ник" required>
+            <input type="text" name="nickname" id="id_nickname" placeholder="skv1xxx" required value="{{ form.nickname.value|default_if_none:'' }}">
             {% if form.nickname.errors %}
                 <div class="error-message">{{ form.nickname.errors.0 }}</div>
             {% endif %}
         </div>
 
         <div class="form-group">
-            <label for="id_first_name">Имя</label>
-            <input type="text" name="first_name" id="id_first_name" placeholder="Ваше имя" required>
-            {% if form.first_name.errors %}
-                <div class="error-message">{{ form.first_name.errors.0 }}</div>
+            <label for="id_name">Имя</label>
+            <input type="text" name="name" id="id_name" placeholder="Иван" required value="{{ form.name.value|default_if_none:'' }}">
+            {% if form.name.errors %}
+                <div class="error-message">{{ form.name.errors.0 }}</div>
             {% endif %}
         </div>
 
         <div class="form-group">
-            <label for="id_last_name">Фамилия</label>
-            <input type="text" name="last_name" id="id_last_name" placeholder="Ваша фамилия" required>
-            {% if form.last_name.errors %}
-                <div class="error-message">{{ form.last_name.errors.0 }}</div>
+            <label for="id_surname">Фамилия</label>
+            <input type="text" name="surname" id="id_surname" placeholder="Иванов" required value="{{ form.surname.value|default_if_none:'' }}">
+            {% if form.surname.errors %}
+                <div class="error-message">{{ form.surname.errors.0 }}</div>
             {% endif %}
         </div>
 
         <div class="form-group">
             <label for="id_email">Email</label>
-            <input type="email" name="email" id="id_email" placeholder="example@mail.com" required>
+            <input type="email" name="email" id="id_email" placeholder="example@mail.com" required value="{{ form.email.value|default_if_none:'' }}">
             {% if form.email.errors %}
                 <div class="error-message">{{ form.email.errors.0 }}</div>
             {% endif %}
         </div>
 
         <div class="form-group">
-            <label for="id_avatar">Аватар</label>
-            <div class="avatar-input">
-                <input type="file" name="avatar" id="id_avatar" accept="image/*">
-                <img id="avatar-preview" class="avatar-preview" src="#" alt="Предпросмотр аватарки">
+            <label>Аватар</label>
+            <div class="avatar-upload">
+                <img id="avatar-preview" class="avatar-preview" src="#" alt="Предпросмотр">
+                <div>
+                    <div class="avatar-upload-btn btn-outline">
+                        Выберите файл
+                        <input type="file" name="photo" id="id_photo" accept="image/*">
+                    </div>
+                    <div id="filename" class="filename">Файл не выбран</div>
+                </div>
             </div>
-            {% if form.avatar.errors %}
-                <div class="error-message">{{ form.avatar.errors.0 }}</div>
+            {% if form.photo.errors %}
+                <div class="error-message">{{ form.photo.errors.0 }}</div>
             {% endif %}
         </div>
 
         <div class="form-group">
-            <label for="id_password1">Пароль</label>
-            <input type="password" name="password1" id="id_password1" placeholder="Не менее 8 символов" required>
-            {% if form.password1.errors %}
-                <div class="error-message">{{ form.password1.errors.0 }}</div>
+            <label for="id_password">Пароль</label>
+            <input type="password" name="password" id="id_password" placeholder="Не менее 8 символов" required>
+            {% if form.password.errors %}
+                <div class="error-message">{{ form.password.errors.0 }}</div>
             {% endif %}
         </div>
 
         <div class="form-group">
-            <label for="id_password2">Подтверждение пароля</label>
-            <input type="password" name="password2" id="id_password2" placeholder="Повторите пароль" required>
-            {% if form.password2.errors %}
-                <div class="error-message">{{ form.password2.errors.0 }}</div>
+            <label for="id_confirm_password">Подтверждение пароля</label>
+            <input type="password" name="confirm_password" id="id_confirm_password" placeholder="Повторите пароль" required>
+            {% if form.confirm_password.errors %}
+                <div class="error-message">{{ form.confirm_password.errors.0 }}</div>
             {% endif %}
         </div>
 
-        <button type="submit">Зарегистрироваться</button>
+        <button type="submit" id="submitBtn">Зарегистрироваться</button>
     </form>
 
     <div class="login-link">
@@ -212,23 +304,32 @@
 </div>
 
 <script>
-    // Предпросмотр аватарки
-    document.getElementById('id_avatar').addEventListener('change', function(e) {
+    document.getElementById('id_photo').addEventListener('change', function(e) {
         const preview = document.getElementById('avatar-preview');
+        const filename = document.getElementById('filename');
         const file = e.target.files[0];
-        
+
         if (file) {
             const reader = new FileReader();
-            
+
             reader.onload = function(e) {
                 preview.src = e.target.result;
                 preview.style.display = 'block';
+                filename.textContent = file.name;
             }
-            
+
             reader.readAsDataURL(file);
         } else {
             preview.style.display = 'none';
+            filename.textContent = 'Файл не выбран';
         }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', function() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.textContent = 'Создаём аккаунт...';
     });
 </script>
 {% endblock %}

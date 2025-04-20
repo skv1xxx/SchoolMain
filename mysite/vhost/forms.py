@@ -1,15 +1,11 @@
 from django import forms
 from .models import *
-from django import forms
-from django.utils import timezone
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
-
+from django.contrib.auth.hashers import make_password
 
 class VideoForm(forms.ModelForm):
     class Meta:
         model = BDvid
-        fields = ['title', 'description', 'publish_time', 'video_file', 'category']
+        fields = ['title', 'description', 'video_file', 'thumbnail', 'category', 'publish_time']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -20,35 +16,85 @@ class VideoForm(forms.ModelForm):
                 'placeholder': 'Описание видео',
                 'rows': 4
             }),
-            'publish_time': forms.DateTimeInput(attrs={
-                'class': 'form-control',
-                'type': 'datetime-local'
-            }),
             'video_file': forms.FileInput(attrs={
-                'class': 'form-control'
+                'class': 'form-control',
+                'accept': 'video/*'
             }),
-            'kat': forms.Select(attrs={
+            'thumbnail': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
+            'category': forms.Select(attrs={
                 'class': 'form-control'
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['publish_time'] = forms.DateTimeField(
+            initial=timezone.now(),
+            widget=forms.HiddenInput()
+        )
 
-class CustomUserCreationForm(UserCreationForm):
-    password1 = forms.CharField(
-        label="Пароль",
-        widget=forms.PasswordInput(attrs={'placeholder': 'Не менее 8 символов'}),
-    )
-    password2 = forms.CharField(
-        label="Подтверждение пароля",
-        widget=forms.PasswordInput(attrs={'placeholder': 'Повторите пароль'}),
-    )
+class RegistrationForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Пароль'
+    }))
+    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Подтвердите пароль'
+    }))
 
     class Meta:
         model = BDuser
-        fields = ('nickname', 'first_name', 'last_name', 'email', 'avatar', 'password1', 'password2')
+        fields = ['nickname', 'name', 'surname', 'email', 'photo', 'password']
         widgets = {
-            'nickname': forms.TextInput(attrs={'placeholder': 'Ваш уникальный ник'}),
-            'first_name': forms.TextInput(attrs={'placeholder': 'Ваше имя'}),
-            'last_name': forms.TextInput(attrs={'placeholder': 'Ваша фамилия'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'example@mail.com'}),
+            'nickname': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Никнейм'
+            }),
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Имя'
+            }),
+            'surname': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Фамилия'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Email'
+            }),
+            'photo': forms.FileInput(attrs={
+                'class': 'form-control'
+            }),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if password != confirm_password:
+            raise forms.ValidationError("Пароли не совпадают")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.password = make_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
+
+
+class LoginForm(forms.Form):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Email'
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Пароль'
+    }))

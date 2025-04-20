@@ -1,17 +1,254 @@
 {% extends "design/design.html" %}
-{%load static %}
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Любимый сайтик)</title>
-</head>
-<body>
+{% load static %}
 
-{% block content%}
-<a href="upload">Опубликовать видео</a>
-<a href="reg"> Регистрация</a>
-{% endblock content%}
-</body>
-</html>
+{% block content %}
+<div class="account-container">
+    {% if user.is_authenticated %}
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="avatar-container">
+                    {% if user.photo %}
+                        <img src="{{ user.photo.url }}" alt="Аватар" class="profile-avatar">
+                    {% else %}
+                        <div class="default-avatar">{{ user.nickname|first|upper }}</div>
+                    {% endif %}
+                </div>
+                <h1 class="profile-username">{{ user.nickname }}</h1>
+            </div>
+            <div class="profile-info">
+                <div class="info-item">
+                    <span class="info-label">Имя:</span>
+                    <span class="info-value">{{ user.name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Фамилия:</span>
+                    <span class="info-value">{{ user.surname }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ user.email }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Дата регистрации:</span>
+                    <span class="info-value">{{ user.date_joined|date:"d.m.Y" }}</span>
+                </div>
+            </div>
+            <div class="profile-actions">
+                <a href="{% url 'upload' %}" class="action-btn upload-btn">
+                    <i class="fas fa-cloud-upload-alt"></i> Загрузить видео
+                </a>
+                <a href="{% url 'logout' %}" class="action-btn logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Выйти
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="guest-card">
+            <div class="welcome-message">
+                <h2>Добро пожаловать!</h2>
+                <p>Войдите в свой аккаунт или зарегистрируйтесь, чтобы получить доступ ко всем возможностям</p>
+            </div>
+            <div class="auth-buttons">
+                <a href="{% url 'ent' %}" class="auth-btn login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+                <a href="{% url 'reg' %}" class="auth-btn register-btn">
+                    <i class="fas fa-user-plus"></i> Регистрация
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .account-container {
+        max-width: 800px;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    /* Карточка профиля */
+    .profile-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        text-align: center;
+    }
+
+    /* Шапка профиля */
+    .profile-header {
+        margin-bottom: 30px;
+    }
+
+    .avatar-container {
+        display: inline-block;
+        margin-bottom: 15px;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #ff8c00;
+        box-shadow: 0 4px 12px rgba(255, 140, 0, 0.2);
+    }
+
+    .default-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff8c00, #ff6b00);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: bold;
+        border: 4px solid #ff8c00;
+        margin: 0 auto;
+    }
+
+    .profile-username {
+        color: #333;
+        font-size: 28px;
+        margin: 10px 0 0;
+    }
+
+    .profile-info {
+        background: #f9f9f9;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 0 auto 30px;
+        max-width: 400px;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .info-value {
+        color: #333;
+        font-weight: 600;
+    }
+
+    /* Кнопки действий */
+    .profile-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 12px 25px;
+        border-radius: 30px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .upload-btn {
+        background: #ff8c00;
+        color: white;
+        border: 2px solid #ff8c00;
+    }
+
+    .upload-btn:hover {
+        background: #e67300;
+        border-color: #e67300;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+    }
+
+    .logout-btn {
+        background: white;
+        color: #ff8c00;
+        border: 2px solid #ff8c00;
+    }
+
+    .logout-btn:hover {
+        background: #fff5eb;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 140, 0, 0.1);
+    }
+
+    /* Гостевая карточка */
+    .guest-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        text-align: center;
+    }
+
+    .welcome-message h2 {
+        color: #ff8c00;
+        margin-bottom: 15px;
+    }
+
+    .welcome-message p {
+        color: #666;
+        margin-bottom: 25px;
+        font-size: 16px;
+    }
+
+    .auth-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .auth-btn {
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .login-btn {
+        background: #ff8c00;
+        color: white;
+        border: 2px solid #ff8c00;
+    }
+
+    .login-btn:hover {
+        background: #e67300;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+    }
+
+    .register-btn {
+        background: white;
+        color: #ff8c00;
+        border: 2px solid #ff8c00;
+    }
+
+    .register-btn:hover {
+        background: #fff5eb;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 140, 0, 0.1);
+    }
+</style>
+{% endblock %}

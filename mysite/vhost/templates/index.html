@@ -1,16 +1,228 @@
-{% extends "design/design.html" %}
 {%load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Любимый сайтик)</title>
+    <title>Сайтик)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-margin {
+            height: 50px;
+            background: linear-gradient(135deg, #ff8c00, #ff6b00);
+        }
+
+        header {
+            background-color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-button {
+            padding: 10px 20px;
+            background-color: #ff8c00;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-button:hover {
+            background-color: #e67300;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        main {
+            flex: 1;
+            width: 100%;
+            max-width: 1400px;
+            margin: 20px auto 0;
+            padding: 0 20px;
+        }
+
+        .content {
+            width: 100%;
+            padding: 20px 0;
+        }
+
+        .search-input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 8px;
+            opacity: 0.6;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 15px;
+            align-items: start;
+        }
+
+        .video-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 140px;
+            background-color: #eee;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-info {
+            padding: 12px;
+        }
+
+        .video-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 12px;
+        }
+
+        .default-thumbnail {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff8c00, #ff6b00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: auto;
+            background-color: #333;
+            color: #aaa;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
+    <div class="top-margin"></div>
 
-{% block content%}
-<a> БЛА БЛА БЛА</a>
-{% endblock content%}
+    <header>
+        <div class="header-content">
+            <div class="nav-buttons">
+                <a href="{% url 'home' %}" class="nav-button">Главная</a>
+                <a href="{% url 'kat' %}" class="nav-button">Категории</a>
+                <a href="{% url 'about_us' %}" class="nav-button">О нас</a>
+                <a href="{% url 'acc' %}" class="nav-button">Аккаунт</a>
+            </div>
+            <div class="search-container">
+                <a href="{% url 'search' %}"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE1LjUgMTRoLS43OWwtLjI4LS4yN0MxNS40MSAxMi41OSAxNiAxMS4xMSAxNiA5LjUgMTYgNS45MSAxMy4wOSAzIDkuNSAzUzMgNS45MSAzIDkuNSA1LjkxIDE2IDkuNSAxNmMxLjYxIDAgMy4wOS0uNTkgNC4yMy0xLjU3bC4yNy4yOHYuNzlsNSA0Ljk5TDIwLjQ5IDE5bC00Ljk5LTV6bS02IDBDNy4wMSAxNCA1IDExLjk5IDUgOS41UzcuMDEgNSA5LjUgNSAxNCA3LjAxIDE0IDkuNSAxMS45OSAxNCA5LjUgMTR6IiBmaWxsPSIjNjY2Ii8+PC9zdmc+" alt="Search" class="search-icon">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="content">
+            <div class="video-grid">
+                {% for video in videos %}
+                <a href="{% url 'video_detail' video.id %}" class="video-card">
+                    <div class="video-thumbnail">
+                        {% if video.thumbnail %}
+                            <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
+                        {% else %}
+                            <div class="default-thumbnail">
+                                {{ video.title|slice:":2"|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">{{ video.title }}</div>
+                        <div class="video-meta">
+                            <span>{{ video.category.name|default:"Без категории" }}</span>
+                            <span>{{ video.publish_time|date:"d.m.Y" }}</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+
+    <div class="bottom-margin"></div>
+
+    <footer>
+        Сделано: by skv1xxx
+    </footer>
 </body>
 </html>
