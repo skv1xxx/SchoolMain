@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import VideoForm, RegistrationForm, LoginForm
 from django.contrib.auth import login as auth_login, authenticate, logout
 from django.contrib import messages
@@ -6,7 +6,12 @@ from django.contrib.auth.decorators import login_required
 from .models import *
 from django.utils import timezone
 from django.db.models import Q
-
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.conf import settings
+from django.contrib.auth.hashers import make_password
+from .forms import PasswordResetRequestForm, PasswordResetConfirmForm
+from .models import BDuser, PasswordResetToken
 
 def index(request):
     videos = BDvid.objects.select_related('category').order_by('-publish_time')
@@ -140,3 +145,82 @@ def category_videos(request, category_id):
         })
     except BDkat.DoesNotExist:
         raise Http404("Категория не найдена")
+
+
+def password_reset_request(request):
+    if request.method == 'POST':
+        form = PasswordResetRequestForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+
+            request.session['reset_email'] = email
+
+            user = BDuser.objects.get(email=email)
+
+            PasswordResetToken.objects.filter(
+                user=user,
+                is_used=False,
+                expires_at__gt=timezone.now()
+            ).update(is_used=True)
+
+            token = PasswordResetToken.objects.create(user=user)
+
+            reset_url = request.build_absolute_uri(
+                reverse('password_reset_confirm', args=[token.token])
+            )
+
+            try:
+                send_mail(
+                    subject='Восстановление пароля',
+                    message=f'Ссылка: {reset_url}',
+                    html_message=f'',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[email],
+                    fail_silently=False,
+                )
+                messages.success(request, 'Письмо с инструкциями отправлено на ваш email')
+                return redirect('password_reset_done')
+            except Exception as e:
+                messages.error(request, f'Ошибка при отправке письма: {str(e)}')
+    else:
+        form = PasswordResetRequestForm()
+
+    return render(request, 'password_reset_request.html', {'form': form})
+
+def password_reset_done(request):
+    return render(request, 'password_reset_done.html')
+
+
+def password_reset_confirm(request, token):
+    try:
+        reset_token = PasswordResetToken.objects.get(token=token)
+        if not reset_token.is_valid():
+            messages.error(request, 'Ссылка для восстановления устарела или уже была использована')
+            return redirect('password_reset_request')
+    except PasswordResetToken.DoesNotExist:
+        messages.error(request, 'Недействительная ссылка для восстановления')
+        return redirect('password_reset_request')
+
+    if request.method == 'POST':
+        form = PasswordResetConfirmForm(request.POST)
+        if form.is_valid():
+            user = reset_token.user
+            user.password = make_password(form.cleaned_data['new_password'])
+            user.save()
+
+            reset_token.is_used = True
+            reset_token.save()
+
+            messages.success(request, 'Пароль успешно изменен! Теперь вы можете войти.')
+            return redirect('ent')
+    else:
+        form = PasswordResetConfirmForm()
+
+    return render(request, 'password_reset_confirm.html', {
+        'form': form,
+        'user': reset_token.user
+    })
+
+
+def password_reset_complete(request):
+    return render(request, 'password_reset_complete.html')

@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ВидеоХостинг{% endblock %}</title>
+
+    <style>
+        :root {
+            --primary: #FF7F50;
+            --primary-light: #FFA07A;
+            --secondary: #FF6347;
+            --dark: #2F2F2F;
+            --light: #FFF8F5;
+            --error: #E74C3C;
+            --success: #28a745;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --border-radius: 12px;
+            --box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            --gradient: linear-gradient(135deg, #FFB347 0%, #FF8C00 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ШАПКА */
+        .navbar {
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            transition: all 0.3s;
+        }
+
+        .navbar-logo:hover {
+            color: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .navbar-logo span {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-link {
+            padding: 10px 20px;
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 25px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .nav-link-active {
+            background: var(--gradient);
+            color: white !important;
+        }
+
+        .nav-link-active:hover {
+            background: var(--secondary);
+            color: white !important;
+        }
+
+        .nav-button {
+            padding: 10px 24px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(255, 127, 80, 0.2);
+        }
+
+        .nav-button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 99, 71, 0.25);
+        }
+
+        .nav-button-outline {
+            padding: 10px 24px;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-button-outline:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ПОИСК */
+        .search-container {
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 25px;
+            padding: 5px 5px 5px 15px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .search-form:focus-within {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(255, 127, 80, 0.2);
+            background: white;
+        }
+
+        .search-input {
+            border: none;
+            background: transparent;
+            outline: none;
+            padding: 10px 0;
+            font-size: 14px;
+            width: 200px;
+        }
+
+        .search-button {
+            background: var(--gradient);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        /* ОСНОВНОЙ КОНТЕНТ */
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            width: 100%;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* КАРТОЧКИ ДЛЯ ВИДЕО */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 127, 80, 0.15);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .video-info {
+            padding: 15px;
+        }
+
+        .video-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--light);
+            color: var(--primary);
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .video-meta {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        /* КАТЕГОРИИ */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--dark);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 127, 80, 0.15);
+            background: var(--gradient);
+            color: white;
+        }
+
+        .category-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .category-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* АЛЕРТЫ */
+        .alerts-container {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffe69c;
+            color: #856404;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .alert-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .alert-close:hover {
+            opacity: 1;
+        }
+
+        /* ФУТЕР */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 50px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .footer-section h4 {
+            color: var(--primary-light);
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .footer-section p {
+            color: #aaa;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            padding: 20px 20px 0;
+            border-top: 1px solid #444;
+            text-align: center;
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        /* ПРОФИЛЬ В НАВИГАЦИИ */
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 10px 5px 5px;
+            border-radius: 30px;
+            background: var(--light);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-menu-btn:hover {
+            background: #ffe8e0;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 5px 0;
+        }
+
+        /* АДАПТИВНОСТЬ */
+        @media (max-width: 768px) {
+            .navbar-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .search-form {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* УТИЛИТЫ */
+        .text-center { text-align: center; }
+        .mt-3 { margin-top: 15px; }
+        .mt-4 { margin-top: 20px; }
+        .mt-5 { margin-top: 30px; }
+        .mb-3 { margin-bottom: 15px; }
+        .mb-4 { margin-bottom: 20px; }
+        .mb-5 { margin-bottom: 30px; }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 4px 6px rgba(255, 127, 80, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 99, 71, 0.25);
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- ШАПКА -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{% url 'home' %}" class="navbar-logo">
+                <span>🎬 ВидеоХостинг</span>
+            </a>
+
+            <div class="nav-menu">
+                <a href="{% url 'home' %}" class="nav-link {% if request.path == '/' %}nav-link-active{% endif %}">
+                    Главная
+                </a>
+                <a href="{% url 'kat' %}" class="nav-link {% if 'kat' in request.path %}nav-link-active{% endif %}">
+                    Категории
+                </a>
+                <a href="{% url 'about_us' %}" class="nav-link {% if 'about_us' in request.path %}nav-link-active{% endif %}">
+                    О нас
+                </a>
+
+                <!-- ПОИСК -->
+                <div class="search-container">
+                    <form class="search-form" action="{% url 'search' %}" method="GET">
+                        <input class="search-input" type="search" name="q" placeholder="Поиск видео..." value="{{ request.GET.q|default:'' }}">
+                        <button class="search-button" type="submit">
+                            🔍 Найти
+                        </button>
+                    </form>
+                </div>
+
+                <!-- ПОЛЬЗОВАТЕЛЬ -->
+                {% if user.is_authenticated %}
+                    <div class="user-menu" id="userMenu">
+                        <button class="user-menu-btn" onclick="toggleDropdown()">
+                            {% if user.photo %}
+                                <img src="{{ user.photo.url }}" class="user-avatar" alt="{{ user.nickname }}">
+                            {% else %}
+                                <div class="user-avatar" style="background: var(--gradient); display: flex; align-items: center; justify-content: center; color: white;">
+                                    {{ user.nickname|first|upper }}
+                                </div>
+                            {% endif %}
+                            <span class="user-name">{{ user.nickname }}</span>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="{% url 'acc' %}" class="dropdown-item">
+                                👤 Личный кабинет
+                            </a>
+                            <a href="{% url 'upload' %}" class="dropdown-item">
+                                📤 Загрузить видео
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="{% url 'logout' %}" class="dropdown-item" style="color: var(--error);">
+                                🚪 Выйти
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'ent' %}" class="nav-button-outline">
+                        🔑 Вход
+                    </a>
+                    <a href="{% url 'reg' %}" class="nav-button">
+                        📝 Регистрация
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- СООБЩЕНИЯ -->
+    {% if messages %}
+        <div class="alerts-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <span>{{ message }}</span>
+                    <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- ФУТЕР -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>🎬 ВидеоХостинг</h4>
+                <p>Платформа для загрузки и просмотра видео. Делитесь своим творчеством с миром!</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Навигация</h4>
+                <ul class="footer-links">
+                    <li><a href="{% url 'home' %}">Главная</a></li>
+                    <li><a href="{% url 'kat' %}">Категории</a></li>
+                    <li><a href="{% url 'search' %}">Поиск</a></li>
+                    <li><a href="{% url 'about_us' %}">О нас</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Пользователям</h4>
+                <ul class="footer-links">
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'acc' %}">Личный кабинет</a></li>
+                        <li><a href="{% url 'upload' %}">Загрузить видео</a></li>
+                    {% else %}
+                        <li><a href="{% url 'reg' %}">Регистрация</a></li>
+                        <li><a href="{% url 'ent' %}">Вход</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'password_reset_request' %}">Забыли пароль?</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Телеграм</a></li>
+                    <li><a href="#">ВКонтакте</a></li>
+                    <li><a href="#">Email</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; {% now "Y" %} ВидеоХостинг. Сделано: by skv1xxx</p>
+        </div>
+    </footer>
+
+    <script>
+        // Функция для открытия/закрытия выпадающего меню
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Закрытие меню при клике вне его
+        window.onclick = function(event) {
+            if (!event.target.closest('.user-menu')) {
+                const dropdowns = document.getElementsByClassName('dropdown-menu');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    dropdowns[i].classList.remove('show');
+                }
+            }
+        }
+
+        // Автоматическое закрытие алертов через 5 секунд
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    if (alert) alert.remove();
+                }, 5000);
+            });
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

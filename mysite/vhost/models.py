@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.core.validators import FileExtensionValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
+import secrets
+from datetime import timedelta
 
 class BDuserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -115,3 +117,26 @@ class BDkat(models.Model):
         verbose_name = "Категория"
         verbose_name_plural = "Категория"
         ordering = ["name"]
+
+class PasswordResetToken(models.Model):
+    """Модель для хранения токенов сброса пароля"""
+    user = models.ForeignKey(BDuser, on_delete=models.CASCADE, related_name='password_reset_tokens')
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = secrets.token_urlsafe(32)  # генерация безопасного токена
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(hours=24)  # токен действует 24 часа
+        super().save(*args, **kwargs)
+
+    def is_valid(self):
+        """Проверка, действителен ли токен"""
+        return not self.is_used and timezone.now() <= self.expires_at
+
+    def __str__(self):
+        status = 'Active' if self.is_valid() else 'Expired/Used'
+        return f"Token for {self.user.email} - {status}"

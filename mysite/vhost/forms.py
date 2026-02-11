@@ -1,6 +1,54 @@
 from django import forms
 from .models import *
 from django.contrib.auth.hashers import make_password
+from .models import BDuser, PasswordResetToken
+
+class PasswordResetRequestForm(forms.Form):
+    """Форма запроса на сброс пароля"""
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Введите ваш email'
+        })
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        try:
+            user = BDuser.objects.get(email=email)
+        except BDuser.DoesNotExist:
+            raise forms.ValidationError('Пользователь с таким email не найден')
+        return email
+
+
+class PasswordResetConfirmForm(forms.Form):
+    """Форма установки нового пароля"""
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Новый пароль'
+        })
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Подтвердите пароль'
+        })
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get('new_password')
+        confirm_password = cleaned_data.get('confirm_password')
+
+        if new_password and confirm_password and new_password != confirm_password:
+            raise forms.ValidationError('Пароли не совпадают')
+
+        # Проверка сложности пароля
+        if new_password and len(new_password) < 8:
+            raise forms.ValidationError('Пароль должен содержать минимум 8 символов')
+
+        return cleaned_data
 
 class VideoForm(forms.ModelForm):
     class Meta:
