@@ -21,7 +21,7 @@ urlpatterns = [
     path('ent/', views.login_view, name='ent'),
     path('logout/', views.logout_view, name='logout'),
 
-    # Восстановление пароля (НОВЫЕ СТРАНИЦЫ)
+    # Восстановление пароля
     path('repass/', views.password_reset_request, name='password_reset_request'),
     path('repass/done/', views.password_reset_done, name='password_reset_done'),
     path('repass/confirm/<str:token>/', views.password_reset_confirm, name='password_reset_confirm'),

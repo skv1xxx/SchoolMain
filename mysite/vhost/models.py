@@ -119,7 +119,6 @@ class BDkat(models.Model):
         ordering = ["name"]
 
 class PasswordResetToken(models.Model):
-    """Модель для хранения токенов сброса пароля"""
     user = models.ForeignKey(BDuser, on_delete=models.CASCADE, related_name='password_reset_tokens')
     token = models.CharField(max_length=64, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -128,13 +127,12 @@ class PasswordResetToken(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.token:
-            self.token = secrets.token_urlsafe(32)  # генерация безопасного токена
+            self.token = secrets.token_urlsafe(32)
         if not self.expires_at:
-            self.expires_at = timezone.now() + timedelta(hours=24)  # токен действует 24 часа
+            self.expires_at = timezone.now() + timedelta(hours=24)
         super().save(*args, **kwargs)
 
     def is_valid(self):
-        """Проверка, действителен ли токен"""
         return not self.is_used and timezone.now() <= self.expires_at
 
     def __str__(self):

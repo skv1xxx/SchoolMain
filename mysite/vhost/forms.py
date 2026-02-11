@@ -4,7 +4,6 @@ from django.contrib.auth.hashers import make_password
 from .models import BDuser, PasswordResetToken
 
 class PasswordResetRequestForm(forms.Form):
-    """Форма запроса на сброс пароля"""
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
@@ -22,7 +21,6 @@ class PasswordResetRequestForm(forms.Form):
 
 
 class PasswordResetConfirmForm(forms.Form):
-    """Форма установки нового пароля"""
     new_password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
